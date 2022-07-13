@@ -151,13 +151,33 @@ public class RegisterTests
 		}
 
 		// Underflow test
-		unchecked {
+		unchecked
+		{
 			const uint num1 = 1, num2 = 100;
 			const uint diff = num1 - num2;
 			Register reg1 = new(32), reg2 = new(32);
 			reg1.Set(num1);
 			reg2.Set(num2);
 			Assert.AreEqual(diff, (uint) (reg1 - reg2).Number);
+		}
+	}
+
+	[Test]
+	public void BitTest()
+	{
+		Random rng = new();
+		for (var i = 0; i < 1000; i++)
+		{
+			uint num1 = (uint) rng.Next(), num2 = (uint) rng.Next();
+			Register reg1 = new(32), reg2 = new(32);
+			reg1.Set(num1);
+			reg2.Set(num2);
+			Assert.AreEqual(num1 | num2, (uint) (reg1 | reg2).Number);
+			Assert.AreEqual(num1 & num2, (uint) (reg1 & reg2).Number);
+			Assert.AreEqual(num1 ^ num2, (uint) (reg1 ^ reg2).Number);
+			// These operations should not change inner values
+			Assert.AreEqual(num1, (uint) reg1.Number);
+			Assert.AreEqual(num2, (uint) reg2.Number);
 		}
 	}
 }

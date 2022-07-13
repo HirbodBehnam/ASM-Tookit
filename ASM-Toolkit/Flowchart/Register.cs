@@ -90,6 +90,17 @@ public class Register
 	}
 
 	/// <summary>
+	/// Clone will make a copy from this register
+	/// </summary>
+	/// <returns>A copied register</returns>
+	public Register Clone()
+	{
+		var reg = new Register(Length);
+		reg.Set(this);
+		return reg;
+	}
+
+	/// <summary>
 	/// Unary or
 	/// </summary>
 	/// <returns>True if there is at least one 1 in bitset</returns>
@@ -117,6 +128,13 @@ public class Register
 		reg.Set(b);
 		return reg;
 	}
+
+	/// <summary>
+	/// Creates a one bit register from a bool
+	/// </summary>
+	/// <param name="b">The bool</param>
+	/// <returns>A <see cref="Register"/> with <see cref="Length"/> of one</returns>
+	public static explicit operator Register(bool b) => new(new BitArray(new[] {b}));
 
 	/// <summary>
 	/// Will create a copy of this register with same length which has all of it's bits inverted
@@ -207,6 +225,10 @@ public class Register
 		resultRegister.Set(resultNumber);
 		return resultRegister;
 	}
+
+	public static Register operator |(Register a, Register b) => new(new BitArray(a._data).Or(b._data));
+	public static Register operator &(Register a, Register b) => new(new BitArray(a._data).And(b._data));
+	public static Register operator ^(Register a, Register b) => new(new BitArray(a._data).Xor(b._data));
 
 	public static bool operator >(Register a, Register b) => a.Number > b.Number;
 	public static bool operator >=(Register a, Register b) => a.Number >= b.Number;
