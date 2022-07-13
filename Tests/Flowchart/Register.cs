@@ -31,7 +31,7 @@ public class RegisterTests
 		{
 			var number = (uint) rng.Next();
 			reg.Set(number);
-			Assert.AreEqual(number, (uint) reg.Number);
+			Assert.AreEqual(number, (uint) reg);
 			Assert.AreEqual(number.ToString(), reg.ToString());
 		}
 
@@ -41,7 +41,7 @@ public class RegisterTests
 			var number = (uint) rng.Next();
 			number |= 2147483648; // 1 << 31
 			reg.Set(number);
-			Assert.AreEqual(number, (uint) reg.Number);
+			Assert.AreEqual(number, (uint) reg);
 			Assert.AreEqual(number.ToString(), reg.ToString());
 		}
 
@@ -53,7 +53,7 @@ public class RegisterTests
 			var number = (uint) rng.Next();
 			reg.Set(number);
 			number &= mask;
-			Assert.AreEqual(number, (uint) reg.Number);
+			Assert.AreEqual(number, (uint) reg);
 			Assert.AreEqual(number.ToString(), reg.ToString());
 		}
 	}
@@ -137,11 +137,11 @@ public class RegisterTests
 			Register reg1 = new(32), reg2 = new(32);
 			reg1.Set(num1);
 			reg2.Set(num2);
-			Assert.AreEqual(num1 + num2, (uint) (reg1 + reg2).Number);
-			Assert.AreEqual(num1 - num2, (uint) (reg1 - reg2).Number);
-			Assert.AreEqual(num1 * num2, (uint) (reg1 * reg2).Number);
-			Assert.AreEqual(num1 / num2, (uint) (reg1 / reg2).Number);
-			Assert.AreEqual(num1 % num2, (uint) (reg1 % reg2).Number);
+			Assert.AreEqual(num1 + num2, (uint) (reg1 + reg2));
+			Assert.AreEqual(num1 - num2, (uint) (reg1 - reg2));
+			Assert.AreEqual(num1 * num2, (uint) (reg1 * reg2));
+			Assert.AreEqual(num1 / num2, (uint) (reg1 / reg2));
+			Assert.AreEqual(num1 % num2, (uint) (reg1 % reg2));
 			Assert.AreEqual(num1 > num2, reg1 > reg2);
 			Assert.AreEqual(num1 < num2, reg1 < reg2);
 			Assert.AreEqual(num1 >= num2, reg1 >= reg2);
@@ -158,7 +158,7 @@ public class RegisterTests
 			Register reg1 = new(32), reg2 = new(32);
 			reg1.Set(num1);
 			reg2.Set(num2);
-			Assert.AreEqual(diff, (uint) (reg1 - reg2).Number);
+			Assert.AreEqual(diff, (uint) (reg1 - reg2));
 		}
 	}
 
@@ -172,12 +172,12 @@ public class RegisterTests
 			Register reg1 = new(32), reg2 = new(32);
 			reg1.Set(num1);
 			reg2.Set(num2);
-			Assert.AreEqual(num1 | num2, (uint) (reg1 | reg2).Number);
-			Assert.AreEqual(num1 & num2, (uint) (reg1 & reg2).Number);
-			Assert.AreEqual(num1 ^ num2, (uint) (reg1 ^ reg2).Number);
+			Assert.AreEqual(num1 | num2, (uint) (reg1 | reg2));
+			Assert.AreEqual(num1 & num2, (uint) (reg1 & reg2));
+			Assert.AreEqual(num1 ^ num2, (uint) (reg1 ^ reg2));
 			// These operations should not change inner values
-			Assert.AreEqual(num1, (uint) reg1.Number);
-			Assert.AreEqual(num2, (uint) reg2.Number);
+			Assert.AreEqual(num1, (uint) reg1);
+			Assert.AreEqual(num2, (uint) reg2);
 		}
 	}
 }

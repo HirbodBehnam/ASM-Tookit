@@ -1,12 +1,17 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=d254ad45_002D4a60_002D4014_002D9f3d_002D4a5c24a0e0aa/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="Register" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;NUnit3x::D09FC037-20DF-48C1-A97D-F01C1D40C774::net6.0::Tests.Flowchart.RegisterTests&lt;/TestId&gt;&#xD;
-  &lt;/TestAncestor&gt;&#xD;
-&lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=e49654d0_002D815a_002D4718_002D9564_002D0ea81eeec08a/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="RegisterTests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+	
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=39f567a8_002D77d6_002D4605_002Db28f_002D9f84b4ce7750/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="RegisterTests #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;NUnit3x::D09FC037-20DF-48C1-A97D-F01C1D40C774::net6.0::Tests.Flowchart.RegisterTests&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;NUnit3x::D09FC037-20DF-48C1-A97D-F01C1D40C774::net6.0::Tests.Flowchart.StatementTests&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::D09FC037-20DF-48C1-A97D-F01C1D40C774::net6.0::Tests.Flowchart.AsmBlockTest&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
-&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=549cfaa9_002D113e_002D41d1_002D989d_002D6692e3eaac86/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from &amp;lt;Tests&amp;gt;" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;Project Location="H:\Project\Visual Studio Projects\ASM-Toolkit\Tests" Presentation="&amp;lt;Tests&amp;gt;" /&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	
+	
+	
+	
+	</wpf:ResourceDictionary>

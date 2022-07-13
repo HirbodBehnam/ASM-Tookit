@@ -4,13 +4,6 @@ public class Statement
 {
 	private readonly IEnumerable<Instruction> _instructions;
 
-	public class RegisterNotFoundException : Exception
-	{
-		public RegisterNotFoundException(string registerName) : base("register not found: " + registerName)
-		{
-		}
-	}
-
 	public abstract class Instruction
 	{
 		// Empty class
@@ -78,12 +71,38 @@ public class Statement
 	/// Evaluate will execute the expression on a list of registers and returns the result 
 	/// </summary>
 	/// <param name="registers">The list of registers which might be used</param>
-	/// <param name="finalRegisterSize">The result register size</param>
+	/// <param name="finalRegisterSize">The result register size<br/>
+	/// If this is less than or equal zero the biggest register size will be chosen</param>
 	/// <returns>The evaluated result</returns>
 	/// <exception cref="RegisterNotFoundException">If the resister needed in statements could not be found in <see cref="registers"/></exception>
 	/// <exception cref="ArgumentOutOfRangeException">If the operation in registers is invalid</exception>
-	public Register Evaluate(Dictionary<string, Register> registers, int finalRegisterSize)
+	public Register Evaluate(Dictionary<string, Register> registers, int finalRegisterSize = 0)
 	{
+		// Evaluate final register size if need
+		if (finalRegisterSize <= 0)
+		{
+			foreach (Instruction instruction in _instructions)
+			{
+				var currentSize = 0;
+				switch (instruction)
+				{
+					case InstructionConstant:
+						currentSize = 32;
+						break;
+					case InstructionRegister reg:
+					{
+						// Check if the register exists and then push it into registers
+						if (!registers.TryGetValue(reg.Name, out Register? register))
+							throw new RegisterNotFoundException(reg.Name);
+						currentSize = register.Length;
+						break;
+					}
+				}
+
+				finalRegisterSize = Math.Max(finalRegisterSize, currentSize);
+			}
+		}
+
 		// Just like https://www.geeksforgeeks.org/stack-set-4-evaluation-postfix-expression/
 		Stack<Register> regs = new();
 		foreach (Instruction instruction in _instructions)
@@ -101,11 +120,12 @@ public class Statement
 				case InstructionRegister reg:
 				{
 					// Check if the register exists and then push it into registers
-					if (!registers.ContainsKey(reg.Name))
+					// Needs to be checked if the finalRegisterSize is non zero
+					if (!registers.TryGetValue(reg.Name, out Register? sourceRegister))
 						throw new RegisterNotFoundException(reg.Name);
 					// No need to clone
 					Register register = new(finalRegisterSize);
-					register.Set(registers[reg.Name]);
+					register.Set(sourceRegister);
 					regs.Push(register);
 					break;
 				}

@@ -129,6 +129,15 @@ public class Register
 		return reg;
 	}
 
+	public static implicit operator uint(Register r) => (uint) r.Number;
+
+	/// <summary>
+	/// Conversion to bool is like <see cref="Number"/> != 0
+	/// </summary>
+	/// <param name="r">The register</param>
+	/// <returns>If at least one bit is not zero</returns>
+	public static implicit operator bool(Register r) => r.Or();
+
 	/// <summary>
 	/// Creates a one bit register from a bool
 	/// </summary>
