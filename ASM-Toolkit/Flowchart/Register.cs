@@ -89,6 +89,11 @@ public class Register
 			this[i] = reg[i]; // Copy bits
 	}
 
+	public void Reset()
+	{
+		_data.SetAll(false);
+	}
+
 	/// <summary>
 	/// Clone will make a copy from this register
 	/// </summary>
