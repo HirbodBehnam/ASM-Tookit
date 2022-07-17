@@ -181,4 +181,18 @@ public class Statement
 
 		return regs.Pop();
 	}
+
+	/// <summary>
+	/// This method checks if a register is used in the expression
+	/// </summary>
+	/// <param name="registerName">The register name to check</param>
+	/// <returns>True if used otherwise false</returns>
+	public bool UsedRegister(string registerName)
+	{
+		foreach (Instruction instruction in _instructions)
+			if (instruction is InstructionRegister register && register.Name == registerName)
+				return true;
+
+		return false;
+	}
 }

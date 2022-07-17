@@ -47,7 +47,7 @@ public class Asm
 	/// <summary>
 	/// Returns a merged dictionary of <see cref="Inputs"/> and <see cref="Outputs"/> and <see cref="Registers"/> 
 	/// </summary>
-	private Dictionary<string, Register> MergedVariables
+	public Dictionary<string, Register> MergedVariables
 	{
 		get
 		{
@@ -133,4 +133,24 @@ public class Asm
 	}
 
 	public AsmBlock? GetFirstState => _firstState;
+
+	/// <summary>
+	/// Checks if a register is used in the whole ASM chart
+	/// </summary>
+	/// <param name="registerName">The register to check</param>
+	/// <returns>True if the register is being used</returns>
+	public bool IsRegisterBeingUsed(string registerName)
+	{
+		foreach (AsmBlock block in States.Values)
+		{
+			foreach ((string destinationRegisterName, Statement statement) in block.Statements)
+			{
+				// Check if they use the register
+				if (registerName == destinationRegisterName || statement.UsedRegister(registerName))
+					return true;
+			}
+		}
+
+		return false;
+	}
 }
