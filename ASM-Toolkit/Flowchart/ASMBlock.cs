@@ -27,6 +27,19 @@ public class AsmBlock
 		{
 			StateName = stateName;
 		}
+
+		public override bool Equals(object? obj)
+		{
+			// Check for null and compare run-time types.
+			if (obj == null || GetType() != obj.GetType())
+				return false;
+			return StateName == ((AftermathJump) obj).StateName;
+		}
+
+		public override int GetHashCode()
+		{
+			return StateName.GetHashCode();
+		}
 	}
 
 	public class AftermathCondition : Aftermath
@@ -47,6 +60,27 @@ public class AsmBlock
 			ConditionTrueStatements = conditionTrueStatements ?? Array.Empty<(string, Statement)>();
 			NextStateFalse = nextStateFalse;
 			NextStateTrue = nextStateTrue;
+		}
+
+		public override bool Equals(object? obj)
+		{
+			// Check for null and compare run-time types.
+			if (obj == null || GetType() != obj.GetType())
+				return false;
+			// Cast
+			var other = (AftermathCondition) obj;
+			return Condition.Equals(other.Condition) &&
+			       NextStateTrue == other.NextStateTrue &&
+			       NextStateFalse == other.NextStateFalse &&
+			       ConditionTrueStatements.SequenceEqual(other.ConditionTrueStatements) &&
+			       ConditionFalseStatements.SequenceEqual(other.ConditionFalseStatements);
+		}
+
+
+		public override int GetHashCode()
+		{
+			return HashCode.Combine(Condition, ConditionTrueStatements, ConditionFalseStatements, NextStateTrue,
+				NextStateFalse);
 		}
 	}
 

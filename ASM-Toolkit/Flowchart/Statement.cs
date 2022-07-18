@@ -17,6 +17,19 @@ public class Statement
 		{
 			this.Op = op;
 		}
+
+		public override bool Equals(object? obj)
+		{
+			// Check for null and compare run-time types.
+			if (obj == null || GetType() != obj.GetType())
+				return false;
+			return Op == ((InstructionOperator) obj).Op;
+		}
+
+		public override int GetHashCode()
+		{
+			return (int) Op;
+		}
 	}
 
 	public enum Operator
@@ -50,6 +63,19 @@ public class Statement
 		{
 			Constant = constant;
 		}
+
+		public override bool Equals(object? obj)
+		{
+			// Check for null and compare run-time types.
+			if (obj == null || GetType() != obj.GetType())
+				return false;
+			return Constant == ((InstructionConstant) obj).Constant;
+		}
+
+		public override int GetHashCode()
+		{
+			return (int) Constant;
+		}
 	}
 
 	public class InstructionRegister : Instruction
@@ -59,6 +85,19 @@ public class Statement
 		public InstructionRegister(string registerName)
 		{
 			Name = registerName;
+		}
+
+		public override bool Equals(object? obj)
+		{
+			// Check for null and compare run-time types.
+			if (obj == null || GetType() != obj.GetType())
+				return false;
+			return Name == ((InstructionRegister) obj).Name;
+		}
+
+		public override int GetHashCode()
+		{
+			return Name.GetHashCode();
 		}
 	}
 
@@ -194,5 +233,59 @@ public class Statement
 				return true;
 
 		return false;
+	}
+
+	/// <summary>
+	/// This method will convert the instructions in this statement to a list of <see cref="AsmSaverLoader.SavedInstruction"/>
+	/// and enables the easy save of them
+	/// </summary>
+	/// <returns>A list of <see cref="AsmSaverLoader.SavedInstruction"/></returns>
+	public List<AsmSaverLoader.SavedInstruction> ToSavedInstructions()
+	{
+		List<AsmSaverLoader.SavedInstruction> result = new();
+		foreach (Instruction instruction in _instructions)
+		{
+			switch (instruction)
+			{
+				case InstructionOperator op:
+					result.Add(new AsmSaverLoader.SavedInstruction
+					{
+						Op = op.Op,
+					});
+					break;
+				case InstructionRegister reg:
+					result.Add(new AsmSaverLoader.SavedInstruction
+					{
+						RegisterName = reg.Name,
+					});
+					break;
+				case InstructionConstant c:
+					result.Add(new AsmSaverLoader.SavedInstruction
+					{
+						Constant = c.Constant,
+					});
+					break;
+			}
+		}
+
+		return result;
+	}
+
+	public override bool Equals(object? obj)
+	{
+		// Check for null and compare run-time types.
+		if (obj == null || GetType() != obj.GetType())
+			return false;
+		// Get statements
+		List<Instruction> statements1 = _instructions.ToList(), statements2 = ((Statement) obj)._instructions.ToList();
+		if (statements1.Count != statements2.Count)
+			return false;
+		// Check each one
+		return !statements1.Where((t, i) => !t.Equals(statements2[i])).Any();
+	}
+
+	public override int GetHashCode()
+	{
+		return _instructions.GetHashCode();
 	}
 }

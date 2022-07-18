@@ -142,4 +142,62 @@ public class StatementTests
 		Assert.AreEqual(1024, result.Length);
 		Assert.AreEqual(true, (bool) result);
 	}
+
+	[Test]
+	public void CheckEqual()
+	{
+		// Simple tests
+		{
+			Assert.AreEqual(new Statement.InstructionConstant(123), new Statement.InstructionConstant(123));
+			Assert.AreNotEqual(new Statement.InstructionConstant(12), new Statement.InstructionConstant(123));
+			Statement.Instruction instruction1 = new Statement.InstructionConstant(123);
+			Assert.IsTrue(instruction1.Equals(new Statement.InstructionConstant(123)));
+			instruction1 = new Statement.InstructionOperator(Statement.Operator.Add);
+			Statement.Instruction instruction2 = new Statement.InstructionConstant(123);
+			Assert.IsFalse(instruction1.Equals(instruction2));
+			instruction2 = new Statement.InstructionRegister("hello");
+			Assert.IsFalse(instruction1.Equals(instruction2));
+		}
+		// Statement test
+		{
+			Statement statement1 = new(new Statement.Instruction[]
+			{
+				new Statement.InstructionConstant(1231),
+				new Statement.InstructionRegister("a"),
+				new Statement.InstructionOperator(Statement.Operator.Add),
+				new Statement.InstructionRegister("b"),
+				new Statement.InstructionOperator(Statement.Operator.CompareEqual),
+			});
+			Statement statement2 = new(new Statement.Instruction[]
+			{
+				new Statement.InstructionConstant(1231),
+				new Statement.InstructionRegister("a"),
+				new Statement.InstructionOperator(Statement.Operator.Add),
+				new Statement.InstructionRegister("b"),
+				new Statement.InstructionOperator(Statement.Operator.CompareEqual),
+			});
+			Assert.AreEqual(statement1, statement2);
+			Assert.IsTrue(statement1.Equals(statement2));
+		}
+		{
+			Statement statement1 = new(new Statement.Instruction[]
+			{
+				new Statement.InstructionConstant(1231),
+				new Statement.InstructionRegister("a"),
+				new Statement.InstructionOperator(Statement.Operator.Add),
+				new Statement.InstructionRegister("b"),
+				new Statement.InstructionOperator(Statement.Operator.Add),
+			});
+			Statement statement2 = new(new Statement.Instruction[]
+			{
+				new Statement.InstructionConstant(1231),
+				new Statement.InstructionRegister("a"),
+				new Statement.InstructionOperator(Statement.Operator.Add),
+				new Statement.InstructionRegister("b"),
+				new Statement.InstructionOperator(Statement.Operator.CompareEqual),
+			});
+			Assert.AreNotEqual(statement1, statement2);
+			Assert.IsFalse(statement1.Equals(statement2));
+		}
+	}
 }
