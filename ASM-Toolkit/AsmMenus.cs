@@ -40,6 +40,26 @@ public class AsmMenus
 			switch (ConsoleUtils.InputKey())
 			{
 				case '1': // Save
+					if (_saveLocation == null)
+					{
+						Console.Write("Enter a filename to save the asm chart in it: ");
+						_saveLocation = Console.ReadLine()!;
+					}
+
+					// Try to save
+					var fileContent = "";
+					try
+					{
+						fileContent = AsmSaverLoader.SaveToJson(_asmChart);
+						File.WriteAllText(_saveLocation, fileContent);
+					}
+					catch (Exception ex)
+					{
+						Console.WriteLine("Cannot save the asm chart: " + ex.Message);
+						Console.WriteLine("Here is the content of file:");
+						Console.WriteLine(fileContent);
+					}
+
 					break;
 				case '2': // Input ports
 					PortsModificationMenu(_asmChart.Inputs, "input");

@@ -1,4 +1,5 @@
-﻿using ASM_Toolkit.Util;
+﻿using ASM_Toolkit.Flowchart;
+using ASM_Toolkit.Util;
 
 namespace ASM_Toolkit;
 
@@ -15,7 +16,25 @@ public static class Menus
 			switch (ConsoleUtils.InputKey())
 			{
 				case '1':
+				{
+					Console.Write("Enter the file path: ");
+					string path = Console.ReadLine()!;
+					
+					Asm asm;
+					try
+					{
+						string loadedFile = File.ReadAllText(path);
+						asm = AsmSaverLoader.LoadFromJson(loadedFile);
+					}
+					catch (Exception ex)
+					{
+						Console.WriteLine("Cannot load the saved ASM: " + ex.Message);
+						continue;
+					}
+
+					new AsmMenus(asm, path).MainMenu();
 					break;
+				}
 				case '2':
 					new AsmMenus().MainMenu();
 					break;
