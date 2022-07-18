@@ -37,7 +37,7 @@ public class AsmMenus
 			Console.WriteLine("7. Enter simulation mode");
 			Console.WriteLine("8. Generate verilog code");
 			Console.WriteLine("0. Exit");
-			switch (ConsoleUtils.InputKey())
+			switch (ConsoleUtils.InputKey("Choose: "))
 			{
 				case '1': // Save
 					if (_saveLocation == null)
@@ -52,6 +52,7 @@ public class AsmMenus
 					{
 						fileContent = AsmSaverLoader.SaveToJson(_asmChart);
 						File.WriteAllText(_saveLocation, fileContent);
+						Console.WriteLine("Saved!");
 					}
 					catch (Exception ex)
 					{
@@ -72,6 +73,9 @@ public class AsmMenus
 					break;
 				case '5': // Initial values
 					InitialValueModificationMenu();
+					break;
+				case '6': // State
+					ModifyStateMenu();
 					break;
 				case '0': // Exit
 					if (ConsoleUtils.InputKey("All unsaved changes will be discarded. Press y to exit: ") == 'y')
@@ -96,7 +100,7 @@ public class AsmMenus
 			Console.WriteLine("3. Remove port");
 			Console.WriteLine("4. Change register size");
 			Console.WriteLine("0. Back");
-			switch (ConsoleUtils.InputKey())
+			switch (ConsoleUtils.InputKey("Choose: "))
 			{
 				case '1': // List all
 					if (list.Count == 0)
@@ -136,7 +140,7 @@ public class AsmMenus
 			Console.WriteLine("2. Remove initial value");
 			Console.WriteLine("3. Set initial value");
 			Console.WriteLine("0. Back");
-			switch (ConsoleUtils.InputKey())
+			switch (ConsoleUtils.InputKey("Choose: "))
 			{
 				case '1': // List all
 					if (_asmChart.InitialValues.Count == 0)
@@ -173,6 +177,50 @@ public class AsmMenus
 					_asmChart.InitialValues[registerName] = initialRegister;
 					break;
 				}
+				case '0': // Back
+					return;
+				default:
+					Console.WriteLine(ConsoleUtils.InvalidOptionMessage);
+					break;
+			}
+		}
+	}
+
+	private void ModifyStateMenu()
+	{
+		while (true)
+		{
+			Console.WriteLine("1. List state names");
+			Console.WriteLine("2. View state");
+			Console.WriteLine("3. Add state");
+			Console.WriteLine("4. Remove state");
+			Console.WriteLine("5. Edit state");
+			Console.WriteLine("0. Back");
+			switch (ConsoleUtils.InputKey("Choose: "))
+			{
+				case '1': // List state names
+					if (_asmChart.States.Count == 0)
+						Console.WriteLine("No states created yet!");
+					else
+						foreach (string stateName in _asmChart.States.Keys)
+							Console.WriteLine(stateName);
+					break;
+				case '2': // View state
+				{
+					Console.Write("Enter state name: ");
+					string stateName = Console.ReadLine()!;
+					if (!_asmChart.States.TryGetValue(stateName, out AsmBlock? state))
+					{
+						Console.WriteLine("Cannot find the specified state.");
+						break;
+					}
+
+					Console.WriteLine(state.ToString());
+					break;
+				}
+				case '3': // Add
+					AddState();
+					break;
 				case '0': // Back
 					return;
 				default:
@@ -236,6 +284,204 @@ public class AsmMenus
 	}
 
 	/// <summary>
+	/// Gets the register size in bits of a register which must be in output register or general register
+	/// </summary>
+	/// <param name="registerName">The name to search for</param>
+	/// <returns>The register size or null if it does not exists</returns>
+	private int? GetRegisterSizeOfOutputGeneral(string registerName)
+	{
+		if (_asmChart.Outputs.TryGetValue(registerName, out Register? reg))
+			return reg.Length;
+		if (_asmChart.Registers.TryGetValue(registerName, out reg))
+			return reg.Length;
+		return null;
+	}
+
+	/// <summary>
+	/// Gets the input from user to create a state for asm chart
+	/// </summary>
+	private void AddState()
+	{
+		AsmBlock state = new();
+		// Cache registers
+		HashSet<string> editableRegisters = new(_asmChart.Outputs.Keys.Concat(_asmChart.Registers.Keys));
+		HashSet<string> allRegisters = new(_asmChart.MergedVariables.Keys);
+		// Get the new state name and check it
+		Console.Write("Enter state name: ");
+		string stateName = Console.ReadLine()!;
+		if (_asmChart.States.ContainsKey(stateName))
+		{
+			Console.WriteLine("This state already exists!");
+			return;
+		}
+
+		// Get the statements
+		Console.WriteLine("I will ask you about the statements which will be ran in this state.");
+		state.Statements.AddRange(ReadStatements(editableRegisters, allRegisters));
+
+		// Get the aftermath
+		if (ConsoleUtils.YesNoQuestion("Do you want to create a aftermath now?"))
+			state.AftermathOfBlock = GetAftermath(
+				new HashSet<string>(_asmChart.States.Keys.Append(stateName)),
+				editableRegisters, allRegisters
+			);
+
+		// Done
+		_asmChart.States[stateName] = state;
+	}
+
+	private static AsmBlock.Aftermath GetAftermath(IReadOnlySet<string> validStates, IReadOnlySet<string> mutableRegisters,
+		IReadOnlySet<string> allRegisters)
+	{
+		if (ConsoleUtils.YesNoQuestion("Is the aftermath an unconditional jump?"))
+		{
+			string nextStateName;
+			while (true)
+			{
+				Console.Write("What is the next state name? ");
+				nextStateName = Console.ReadLine()!;
+				if (validStates.Contains(nextStateName))
+					break;
+				Console.WriteLine("Invalid state name.");
+			}
+
+			return new AsmBlock.AftermathJump(nextStateName);
+		}
+
+		// Conditional jump
+		Console.WriteLine("Choose the condition...");
+		Statement condition = ReadStatement(allRegisters);
+		Console.WriteLine("Enter the statements which will be ran if the condition is true:");
+		var trueConditionStatements = ReadStatements(mutableRegisters, allRegisters);
+		Console.WriteLine("Enter the statements which will be ran if the condition is false:");
+		var falseConditionStatements = ReadStatements(mutableRegisters, allRegisters);
+		// Next state names
+		string nextStateFalse, nextStateTrue;
+		while (true)
+		{
+			Console.Write("What is the next state name if condition is true? ");
+			nextStateTrue = Console.ReadLine()!;
+			if (validStates.Contains(nextStateTrue))
+				break;
+			Console.WriteLine("Invalid state name.");
+		}
+
+		while (true)
+		{
+			Console.Write("What is the next state name if condition is false? ");
+			nextStateFalse = Console.ReadLine()!;
+			if (validStates.Contains(nextStateFalse))
+				break;
+			Console.WriteLine("Invalid state name.");
+		}
+
+		// Done
+		return new AsmBlock.AftermathCondition(
+			condition,
+			falseConditionStatements,
+			trueConditionStatements,
+			nextStateFalse,
+			nextStateTrue
+		);
+	}
+
+	private static IEnumerable<(string, Statement)> ReadStatements(IReadOnlySet<string> mutableRegisters,
+		IReadOnlySet<string> allRegisters)
+	{
+		List<(string, Statement)> result = new();
+		while (true)
+		{
+			if (!ConsoleUtils.YesNoQuestion("Add a statement?"))
+				break;
+			// Get the register
+			string destinationRegisterName;
+			while (true)
+			{
+				Console.Write("What register is the destination of this statement? ");
+				destinationRegisterName = Console.ReadLine()!;
+				// Check it
+				if (mutableRegisters.Contains(destinationRegisterName))
+					break;
+				Console.WriteLine("Register not found in Outputs or General Registers");
+			}
+
+			// Get the statement
+			Statement statement = ReadStatement(allRegisters);
+			result.Add((destinationRegisterName, statement));
+		}
+
+		return result;
+	}
+
+	/// <summary>
+	/// Reads a statement from terminal
+	/// </summary>
+	/// <param name="validRegisterNames">List of all registers</param>
+	/// <returns>The statement which user entered</returns>
+	private static Statement ReadStatement(IReadOnlySet<string> validRegisterNames)
+	{
+		// Get operator
+		Console.WriteLine("Please select the operator:");
+		var operators = Enum.GetValues<Statement.Operator>();
+		for (var i = 0; i < operators.Length; i++)
+			Console.WriteLine($"{i + 1}. {operators[i]}");
+		Statement.Operator opt;
+		while (true)
+		{
+			int choice = ConsoleUtils.GetPositiveInteger("Operator? (select by number) ");
+			if (choice <= 0 || choice > operators.Length)
+			{
+				Console.WriteLine("Out of range");
+				continue;
+			}
+
+			opt = operators[choice];
+			break;
+		}
+
+		// Get the first operand
+		Statement.Instruction firstOperand = GetOperand(validRegisterNames, "first operand");
+		if (opt.IsUnary())
+		{
+			return new Statement(new[]
+			{
+				firstOperand,
+				new Statement.InstructionOperator(opt),
+			});
+		}
+
+		// Get the second one
+		Statement.Instruction secondOperand = GetOperand(validRegisterNames, "second operand");
+		return new Statement(new[]
+		{
+			firstOperand,
+			secondOperand,
+			new Statement.InstructionOperator(opt),
+		});
+	}
+
+	/// <summary>
+	/// Gets an operand from user
+	/// </summary>
+	/// <param name="validRegisterNames">Valid names of registers</param>
+	/// <param name="operandName">The operand name to show to user</param>
+	/// <returns>The instruction</returns>
+	private static Statement.Instruction GetOperand(IReadOnlySet<string> validRegisterNames, string operandName)
+	{
+		if (ConsoleUtils.YesNoQuestion($"Is {operandName} a literal constant?"))
+			return new Statement.InstructionConstant((uint) ConsoleUtils.GetPositiveInteger("Enter the number"));
+		// Register
+		while (true)
+		{
+			Console.Write("Enter register name: ");
+			string registerName = Console.ReadLine()!;
+			if (validRegisterNames.Contains(registerName))
+				return new Statement.InstructionRegister(registerName);
+			Console.WriteLine("Invalid register name!");
+		}
+	}
+
+	/// <summary>
 	/// This function will get a register name from user and a number and resizes the register to that size
 	/// </summary>
 	/// <param name="registers">The list of registers</param>
@@ -252,19 +498,5 @@ public class AsmMenus
 
 		int newSize = ConsoleUtils.GetPositiveInteger("Enter the register size: ");
 		registers[registerName] = new Register(newSize);
-	}
-
-	/// <summary>
-	/// Gets the register size in bits of a register which must be in output register or general register
-	/// </summary>
-	/// <param name="registerName">The name to search for</param>
-	/// <returns>The register size or null if it does not exists</returns>
-	private int? GetRegisterSizeOfOutputGeneral(string registerName)
-	{
-		if (_asmChart.Outputs.TryGetValue(registerName, out Register? reg))
-			return reg.Length;
-		if (_asmChart.Registers.TryGetValue(registerName, out reg))
-			return reg.Length;
-		return null;
 	}
 }

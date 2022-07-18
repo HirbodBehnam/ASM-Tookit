@@ -200,4 +200,26 @@ public class StatementTests
 			Assert.IsFalse(statement1.Equals(statement2));
 		}
 	}
+
+	[Test]
+	public void ToStringTest()
+	{
+		var result = new Statement(new Statement.Instruction[]
+		{
+			new Statement.InstructionConstant(1231),
+			new Statement.InstructionRegister("a"),
+			new Statement.InstructionOperator(Statement.Operator.Add),
+			new Statement.InstructionRegister("b"),
+			new Statement.InstructionOperator(Statement.Operator.CompareEqual),
+		}).ToString();
+		Assert.AreEqual("((1231 + a) == b)", result);
+		result = new Statement(new Statement.Instruction[]
+		{
+			new Statement.InstructionConstant(1231),
+			new Statement.InstructionOperator(Statement.Operator.UnaryAnd),
+			new Statement.InstructionRegister("a"),
+			new Statement.InstructionOperator(Statement.Operator.Add),
+		}).ToString();
+		Assert.AreEqual("((And(1231)) + a)", result);
+	}
 }

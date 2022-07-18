@@ -13,7 +13,7 @@ public static class Menus
 			Console.WriteLine("1. Load an ASM chart");
 			Console.WriteLine("2. Create new ASM chart");
 			Console.WriteLine("3. Exit");
-			switch (ConsoleUtils.InputKey())
+			switch (ConsoleUtils.InputKey("Choose: "))
 			{
 				case '1':
 				{

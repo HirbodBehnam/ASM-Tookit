@@ -1,4 +1,6 @@
-﻿namespace ASM_Toolkit.Flowchart;
+﻿using System.Text;
+
+namespace ASM_Toolkit.Flowchart;
 
 public class AsmBlock
 {
@@ -148,5 +150,41 @@ public class AsmBlock
 			Register statementResult = statement.Evaluate(registers, resultRegister.Length);
 			resultRegister.Set(statementResult);
 		}
+	}
+
+	public override string ToString()
+	{
+		const string separator = "=========="; // Separate parts
+		StringBuilder result = new();
+		// Add statements
+		result.AppendLine("Statements in main block:");
+		foreach ((string destinationRegisterName, Statement statement) in Statements)
+			result.AppendLine($"{destinationRegisterName} = {statement}");
+		result.AppendLine(separator);
+		// What happens after the block
+		result.AppendLine("Aftermath:");
+		switch (AftermathOfBlock)
+		{
+			case AftermathJump jump:
+				result.AppendLine($"Simple jump to {jump.StateName}");
+				break;
+			case AftermathCondition condition:
+				result.AppendLine($"Conditional branch: {condition.Condition}");
+				result.AppendLine($"If the result is true the next branch will be {condition.NextStateTrue}");
+				result.AppendLine($"Otherwise it is {condition.NextStateFalse}");
+				result.AppendLine("Statements which will be executed if the result is true:");
+				foreach ((string destinationRegisterName, Statement statement) in condition.ConditionTrueStatements)
+					result.AppendLine($"\t{destinationRegisterName} = {statement}");
+				result.AppendLine("Statements which will be executed if the result is false:");
+				foreach ((string destinationRegisterName, Statement statement) in condition.ConditionFalseStatements)
+					result.AppendLine($"\t{destinationRegisterName} = {statement}");
+				break;
+			default:
+				result.AppendLine("-");
+				break;
+		}
+
+		// Done
+		return result.ToString();
 	}
 }

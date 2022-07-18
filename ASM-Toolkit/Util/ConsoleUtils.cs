@@ -62,4 +62,27 @@ public static class ConsoleUtils
 			Console.WriteLine("Cannot parse number.");
 		}
 	}
+
+	/// <summary>
+	/// This function will ask a user which the input must be either y or n
+	/// </summary>
+	/// <param name="promptText">The prompt text. (y/n) will be appended to it later</param>
+	/// <returns>True if input was y otherwise false</returns>
+	public static bool YesNoQuestion(string promptText)
+	{
+		while (true)
+		{
+			char key = char.ToLower(InputKey(promptText + " (y/n)"));
+			switch (key)
+			{
+				case 'y':
+					return true;
+				case 'n':
+					return false;
+				default:
+					Console.WriteLine("Invalid choose!");
+					break;
+			}
+		}
+	}
 }

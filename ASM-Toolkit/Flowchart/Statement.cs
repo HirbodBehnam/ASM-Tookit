@@ -76,6 +76,11 @@ public class Statement
 		{
 			return (int) Constant;
 		}
+
+		public override string ToString()
+		{
+			return Constant.ToString();
+		}
 	}
 
 	public class InstructionRegister : Instruction
@@ -98,6 +103,11 @@ public class Statement
 		public override int GetHashCode()
 		{
 			return Name.GetHashCode();
+		}
+
+		public override string ToString()
+		{
+			return Name;
 		}
 	}
 
@@ -287,5 +297,56 @@ public class Statement
 	public override int GetHashCode()
 	{
 		return _instructions.GetHashCode();
+	}
+
+	public override string ToString()
+	{
+		// https://www.geeksforgeeks.org/postfix-to-infix/
+		Stack<string> stack = new();
+		// Loop over all stuff
+		foreach (Instruction instruction in _instructions)
+		{
+			switch (instruction)
+			{
+				case InstructionOperator op:
+					string operand = stack.Pop();
+					string toPush = op.Op switch
+					{
+						// Unary
+						Operator.UnaryOr => $"Or({operand})",
+						Operator.UnaryAnd => $"And({operand})",
+						Operator.UnaryXor => $"Xor({operand})",
+						Operator.UnaryNot => $"~{operand}",
+						Operator.UnaryNegate => $"-{operand}",
+						// Arithmetic
+						Operator.Add => $"{stack.Pop()} + {operand}",
+						Operator.Sub => $"{stack.Pop()} - {operand}",
+						Operator.Mult => $"{stack.Pop()} * {operand}",
+						Operator.Div => $"{stack.Pop()} / {operand}",
+						Operator.Mod => $"{stack.Pop()} % {operand}",
+						// Bit
+						Operator.Or => $"{stack.Pop()} | {operand}",
+						Operator.And => $"{stack.Pop()} & {operand}",
+						Operator.Xor => $"{stack.Pop()} ^ {operand}",
+						// Compare
+						Operator.CompareLessThan => $"{stack.Pop()} < {operand}",
+						Operator.CompareLessThanEqual => $"{stack.Pop()} <= {operand}",
+						Operator.CompareGreaterThan => $"{stack.Pop()} > {operand}",
+						Operator.CompareGreaterThanEqual => $"{stack.Pop()} >= {operand}",
+						Operator.CompareEqual => $"{stack.Pop()} == {operand}",
+						Operator.CompareNotEqual => $"{stack.Pop()} != {operand}",
+						// Should never happen
+						_ => throw new ArgumentOutOfRangeException(nameof(op.Op), "invalid operator")
+					};
+					stack.Push($"({toPush})");
+					break;
+				default:
+					stack.Push(instruction.ToString()!);
+					break;
+			}
+		}
+
+		// Done
+		return stack.Pop();
 	}
 }
