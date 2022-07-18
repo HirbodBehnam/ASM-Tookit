@@ -1,4 +1,6 @@
-﻿namespace ASM_Toolkit.Util;
+﻿using System.Numerics;
+
+namespace ASM_Toolkit.Util;
 
 public static class ConsoleUtils
 {
@@ -18,17 +20,45 @@ public static class ConsoleUtils
 	}
 
 	/// <summary>
-	/// This function will read input from stdin until it reaches a number and returns it
+	/// This function will read input from stdin until it reaches a positive number and returns it
 	/// </summary>
 	/// <param name="promptText">The text to print before asking for number</param>
 	/// <returns>The number entered</returns>
-	public static int GetInteger(string promptText = "")
+	public static int GetPositiveInteger(string promptText = "")
 	{
 		while (true)
 		{
 			Console.Write(promptText);
 			if (int.TryParse(Console.ReadLine(), out int number))
-				return number;
+			{
+				if (number > 0)
+					return number;
+				Console.WriteLine("Please enter a positive number.");
+				continue;
+			}
+
+			Console.WriteLine("Cannot parse number.");
+		}
+	}
+
+	/// <summary>
+	/// This function will get a positive big integer from command line
+	/// </summary>
+	/// <param name="promptText">The text to show to user</param>
+	/// <returns>The big integer which user entered</returns>
+	public static BigInteger GetPositiveBigNumber(string promptText = "")
+	{
+		while (true)
+		{
+			Console.Write(promptText);
+			if (BigInteger.TryParse(Console.ReadLine(), out BigInteger number))
+			{
+				if (number.Sign > 0)
+					return number;
+				Console.WriteLine("Please enter a positive number.");
+				continue;
+			}
+
 			Console.WriteLine("Cannot parse number.");
 		}
 	}
