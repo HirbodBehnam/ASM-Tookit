@@ -221,6 +221,9 @@ public class AsmMenus
 				case '3': // Add
 					AddState();
 					break;
+				case '4': // Remove
+					RemoveState();
+					break;
 				case '0': // Back
 					return;
 				default:
@@ -330,7 +333,54 @@ public class AsmMenus
 		_asmChart.States[stateName] = state;
 	}
 
-	private static AsmBlock.Aftermath GetAftermath(IReadOnlySet<string> validStates, IReadOnlySet<string> mutableRegisters,
+	/// <summary>
+	/// Removes a statement of choice of user
+	/// </summary>
+	private void RemoveState()
+	{
+		Console.Write("Enter state name to remove: ");
+		string stateName = Console.ReadLine()!;
+		// Check if state exists
+		if (!_asmChart.States.ContainsKey(stateName))
+		{
+			Console.WriteLine("State does not exists!");
+			return;
+		}
+
+		// Check if the state is being used
+		foreach ((string toCheckName, AsmBlock toCheckState) in _asmChart.States)
+		{
+			if (toCheckName == stateName) // So user can remove cyclic stuff!
+				continue;
+			// Check the end
+			bool inUse = toCheckState.AftermathOfBlock switch
+			{
+				AsmBlock.AftermathCondition aftermathCondition => aftermathCondition.NextStateFalse == stateName ||
+				                                                  aftermathCondition.NextStateTrue == stateName,
+				AsmBlock.AftermathJump aftermathJump => aftermathJump.StateName == stateName,
+				_ => false
+			};
+			if (inUse)
+			{
+				Console.WriteLine($"This state is in use at state {toCheckName}. Cannot remove it.");
+				return;
+			}
+		}
+
+		// Remove and check if it exists
+		_asmChart.States.Remove(stateName);
+		Console.WriteLine("State removed");
+	}
+
+	/// <summary>
+	/// Gets the aftermath for a state from user
+	/// </summary>
+	/// <param name="validStates">The list of states which this block can jump to</param>
+	/// <param name="mutableRegisters">List of registers which can be changed</param>
+	/// <param name="allRegisters">List of all registers</param>
+	/// <returns>The <see cref="AsmBlock.Aftermath"/> entered by user</returns>
+	private static AsmBlock.Aftermath GetAftermath(IReadOnlySet<string> validStates,
+		IReadOnlySet<string> mutableRegisters,
 		IReadOnlySet<string> allRegisters)
 	{
 		if (ConsoleUtils.YesNoQuestion("Is the aftermath an unconditional jump?"))
@@ -385,6 +435,13 @@ public class AsmMenus
 		);
 	}
 
+	/// <summary>
+	/// Read a list of statements from terminal<br/>
+	/// Each entry in list contains a destination register name and the statement
+	/// </summary>
+	/// <param name="mutableRegisters">List of mutable registers</param>
+	/// <param name="allRegisters">List of all registers</param>
+	/// <returns></returns>
 	private static IEnumerable<(string, Statement)> ReadStatements(IReadOnlySet<string> mutableRegisters,
 		IReadOnlySet<string> allRegisters)
 	{
