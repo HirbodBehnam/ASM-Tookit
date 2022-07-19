@@ -39,6 +39,11 @@ public class Asm
 	/// </summary>
 	public AsmBlock? CurrentState { get; private set; }
 
+	public string? CurrentStateName
+	{
+		get { return CurrentState == null ? null : States.FirstOrDefault(x => x.Value == CurrentState).Key; }
+	}
+
 	/// <summary>
 	/// Clocks passed from reset
 	/// </summary>

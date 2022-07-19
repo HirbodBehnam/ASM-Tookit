@@ -34,8 +34,9 @@ public class AsmMenus
 			Console.WriteLine("4. Add/Modify/Remove general registers");
 			Console.WriteLine("5. Add/Modify/Remove initial values");
 			Console.WriteLine("6. Add/Modify/Remove state");
-			Console.WriteLine("7. Enter simulation mode");
-			Console.WriteLine("8. Generate verilog code");
+			Console.WriteLine("7. Set first state");
+			Console.WriteLine("8. Enter simulation mode");
+			Console.WriteLine("9. Generate verilog code");
 			Console.WriteLine("0. Exit");
 			switch (ConsoleUtils.InputKey("Choose: "))
 			{
@@ -76,6 +77,20 @@ public class AsmMenus
 					break;
 				case '6': // State
 					ModifyStateMenu();
+					break;
+				case '7': // First state
+					Console.Write("Enter first state name: ");
+					string firstStateName = Console.ReadLine()!;
+					if (!_asmChart.States.ContainsKey(firstStateName))
+					{
+						Console.WriteLine("Invalid state name!");
+						return;
+					}
+
+					_asmChart.SetFirstState(firstStateName);
+					break;
+				case '8':
+					SimulateMenu();
 					break;
 				case '0': // Exit
 					if (ConsoleUtils.InputKey("All unsaved changes will be discarded. Press y to exit: ") == 'y')
@@ -278,6 +293,55 @@ public class AsmMenus
 
 					state.Statements.RemoveAt(chosenIndex - 1);
 					Console.WriteLine("Removed");
+					break;
+				case '0':
+					return;
+				default:
+					Console.WriteLine(ConsoleUtils.InvalidOptionMessage);
+					break;
+			}
+		}
+	}
+
+	private void SimulateMenu()
+	{
+		if (_asmChart.GetFirstState == null)
+		{
+			Console.WriteLine("First state is not set! Cannot simulate");
+			return;
+		}
+
+		_asmChart.Reset(); // Reset before going into simulation
+		while (true)
+		{
+			Console.WriteLine("Current clock number: " + _asmChart.ClockCounter);
+			Console.WriteLine("Current state: " + _asmChart.CurrentStateName);
+			Console.WriteLine("What do you want to do?");
+			Console.WriteLine("1. List all registers with values");
+			Console.WriteLine("2. Change input values");
+			Console.WriteLine("3. Tick");
+			Console.WriteLine("4. Multi Tick");
+			Console.WriteLine("0. Back");
+			switch (ConsoleUtils.InputKey("Choose: "))
+			{
+				case '1':
+					Console.WriteLine("Inputs:");
+					PrintRegisterValues(_asmChart.Inputs);
+					Console.WriteLine("Outputs:");
+					PrintRegisterValues(_asmChart.Outputs);
+					Console.WriteLine("General Registers:");
+					PrintRegisterValues(_asmChart.Registers);
+					break;
+				case '2':
+					ChangeRegisterValue(_asmChart.Inputs);
+					break;
+				case '3':
+					_asmChart.Tick();
+					break;
+				case '4':
+					int tickCount = ConsoleUtils.GetPositiveInteger("How many ticks? ");
+					for (var i = 0; i < tickCount; i++)
+						_asmChart.Tick();
 					break;
 				case '0':
 					return;
@@ -610,5 +674,25 @@ public class AsmMenus
 
 		int newSize = ConsoleUtils.GetPositiveInteger("Enter the register size: ");
 		registers[registerName] = new Register(newSize);
+	}
+
+	private static void PrintRegisterValues(IDictionary<string, Register> registers)
+	{
+		foreach ((string registerName, Register register) in registers.OrderBy(p => p.Key))
+			Console.WriteLine($"{registerName} ({register.Length} bit): {register}");
+	}
+
+	private static void ChangeRegisterValue(IDictionary<string, Register> registers)
+	{
+		Console.Write("Enter the register name which you want to change: ");
+		string registerName = Console.ReadLine()!;
+		// Check register
+		if (!registers.TryGetValue(registerName, out Register? register))
+		{
+			Console.WriteLine("Register does not exists.");
+			return;
+		}
+		// Get the new value
+		register.Set(ConsoleUtils.GetPositiveBigNumber("Enter the default value for this register: "));
 	}
 }
