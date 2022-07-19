@@ -20,6 +20,45 @@ public static class ConsoleUtils
 	}
 
 	/// <summary>
+	/// Gets a non negative number from user
+	/// </summary>
+	/// <param name="promptText">The text to show before getting the number</param>
+	/// <returns>The number entered by user</returns>
+	public static uint GetNonNegativeInteger(string promptText = "")
+	{
+		while (true)
+		{
+			Console.Write(promptText);
+			if (uint.TryParse(Console.ReadLine(), out uint number))
+				return number;
+
+			Console.WriteLine("Cannot parse number.");
+		}
+	}
+
+	/// <summary>
+	/// This function will get a non negative big integer from command line
+	/// </summary>
+	/// <param name="promptText">The text to show to user</param>
+	/// <returns>The big integer which user entered</returns>
+	public static BigInteger GetNonNegativeBigNumber(string promptText = "")
+	{
+		while (true)
+		{
+			Console.Write(promptText);
+			if (BigInteger.TryParse(Console.ReadLine(), out BigInteger number))
+			{
+				if (number.Sign >= 0)
+					return number;
+				Console.WriteLine("Please enter a non-negative number.");
+				continue;
+			}
+
+			Console.WriteLine("Cannot parse number.");
+		}
+	}
+
+	/// <summary>
 	/// This function will read input from stdin until it reaches a positive number and returns it
 	/// </summary>
 	/// <param name="promptText">The text to print before asking for number</param>

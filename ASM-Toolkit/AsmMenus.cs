@@ -127,7 +127,7 @@ public class AsmMenus
 				case '2': // Add to port
 				{
 					string registerName = GetRegisterName();
-					int registerSize = ConsoleUtils.GetPositiveInteger("Enter register size: ");
+					int registerSize = ConsoleUtils.GetPositiveInteger("Enter register size in bits: ");
 					list[registerName] = new Register(registerSize);
 					break;
 				}
@@ -310,6 +310,13 @@ public class AsmMenus
 			Console.WriteLine("First state is not set! Cannot simulate");
 			return;
 		}
+
+		foreach ((string stateName, AsmBlock state) in _asmChart.States)
+			if (state.AftermathOfBlock == null)
+			{
+				Console.WriteLine($"Empty aftermath in state {stateName}");
+				return;
+			}
 
 		_asmChart.Reset(); // Reset before going into simulation
 		while (true)
@@ -601,28 +608,38 @@ public class AsmMenus
 		var operators = Enum.GetValues<Statement.Operator>();
 		for (var i = 0; i < operators.Length; i++)
 			Console.WriteLine($"{i + 1}. {operators[i]}");
-		Statement.Operator opt;
+		Console.WriteLine($"{operators.Length + 1}. Assignment (copy)");
+		Statement.Operator? opt = null;
+		var simpleAssignment = false;
 		while (true)
 		{
 			int choice = ConsoleUtils.GetPositiveInteger("Operator? (select by number) ");
+			if (choice == operators.Length + 1)
+			{
+				simpleAssignment = true;
+				break;
+			}
+
 			if (choice <= 0 || choice > operators.Length)
 			{
 				Console.WriteLine("Out of range");
 				continue;
 			}
 
-			opt = operators[choice];
+			opt = operators[choice - 1];
 			break;
 		}
 
 		// Get the first operand
 		Statement.Instruction firstOperand = GetOperand(validRegisterNames, "first operand");
-		if (opt.IsUnary())
+		if (opt == null || simpleAssignment)
+			return new Statement(new[] {firstOperand});
+		if (opt.Value.IsUnary())
 		{
 			return new Statement(new[]
 			{
 				firstOperand,
-				new Statement.InstructionOperator(opt),
+				new Statement.InstructionOperator(opt.Value),
 			});
 		}
 
@@ -632,7 +649,7 @@ public class AsmMenus
 		{
 			firstOperand,
 			secondOperand,
-			new Statement.InstructionOperator(opt),
+			new Statement.InstructionOperator(opt.Value),
 		});
 	}
 
@@ -645,7 +662,8 @@ public class AsmMenus
 	private static Statement.Instruction GetOperand(IReadOnlySet<string> validRegisterNames, string operandName)
 	{
 		if (ConsoleUtils.YesNoQuestion($"Is {operandName} a literal constant?"))
-			return new Statement.InstructionConstant((uint) ConsoleUtils.GetPositiveInteger("Enter the number"));
+			return new Statement.InstructionConstant(
+				ConsoleUtils.GetNonNegativeInteger("Enter a non negative number: "));
 		// Register
 		while (true)
 		{
@@ -672,7 +690,7 @@ public class AsmMenus
 			return;
 		}
 
-		int newSize = ConsoleUtils.GetPositiveInteger("Enter the register size: ");
+		int newSize = ConsoleUtils.GetPositiveInteger("Enter the register size in bits: ");
 		registers[registerName] = new Register(newSize);
 	}
 
@@ -692,7 +710,8 @@ public class AsmMenus
 			Console.WriteLine("Register does not exists.");
 			return;
 		}
+
 		// Get the new value
-		register.Set(ConsoleUtils.GetPositiveBigNumber("Enter the default value for this register: "));
+		register.Set(ConsoleUtils.GetNonNegativeBigNumber("Enter the new value for this register: "));
 	}
 }
