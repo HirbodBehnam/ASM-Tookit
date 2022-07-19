@@ -17,6 +17,7 @@ public static class VerilogGenerator
 	{
 		// Create the module info
 		StringBuilder result = new();
+		result.AppendLine("// Generated with ASM-Toolkit. Source https://github.com/HirbodBehnam/ASM-Tookit");
 		result.AppendLine("module MyModule (");
 		result.AppendLine(GenerateInputOutputPorts(asm.Inputs, asm.Outputs));
 		result.AppendLine(");");
