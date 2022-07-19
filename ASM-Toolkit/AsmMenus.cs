@@ -224,7 +224,62 @@ public class AsmMenus
 				case '4': // Remove
 					RemoveState();
 					break;
+				case '5': // Edit
+				{
+					Console.Write("Enter state name: ");
+					string stateName = Console.ReadLine()!;
+					if (!_asmChart.States.TryGetValue(stateName, out AsmBlock? state))
+					{
+						Console.WriteLine("State does not exists.");
+						break;
+					}
+
+					EditState(state);
+					break;
+				}
 				case '0': // Back
+					return;
+				default:
+					Console.WriteLine(ConsoleUtils.InvalidOptionMessage);
+					break;
+			}
+		}
+	}
+
+	private void EditState(AsmBlock state)
+	{
+		// Cache registers
+		HashSet<string> editableRegisters = new(_asmChart.Outputs.Keys.Concat(_asmChart.Registers.Keys));
+		HashSet<string> allRegisters = new(_asmChart.MergedVariables.Keys);
+		while (true)
+		{
+			Console.WriteLine("1. Edit aftermath");
+			Console.WriteLine("2. Add main block statements");
+			Console.WriteLine("3. Remove main block statements");
+			Console.WriteLine("0. Back");
+			switch (ConsoleUtils.InputKey("Choose: "))
+			{
+				case '1':
+					state.AftermathOfBlock = GetAftermath(new HashSet<string>(_asmChart.States.Keys),
+						editableRegisters, allRegisters);
+					break;
+				case '2':
+					state.Statements.AddRange(ReadStatements(editableRegisters, allRegisters));
+					break;
+				case '3':
+					for (var i = 0; i < state.Statements.Count; i++)
+						Console.WriteLine($"{i + 1}. {state.Statements[i].Item1} = {state.Statements[i].Item2}");
+					int chosenIndex = ConsoleUtils.GetPositiveInteger("Enter a number by it's index to remove: ");
+					if (chosenIndex > state.Statements.Count || state.Statements.Count <= 0)
+					{
+						Console.WriteLine("Out of range!");
+						break;
+					}
+
+					state.Statements.RemoveAt(chosenIndex - 1);
+					Console.WriteLine("Removed");
+					break;
+				case '0':
 					return;
 				default:
 					Console.WriteLine(ConsoleUtils.InvalidOptionMessage);
