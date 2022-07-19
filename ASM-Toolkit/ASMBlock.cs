@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace ASM_Toolkit.Flowchart;
+namespace ASM_Toolkit;
 
 public class AsmBlock
 {

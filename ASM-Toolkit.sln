@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASM-Toolkit", "ASM-Toolkit\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{D09FC037-20DF-48C1-A97D-F01C1D40C774}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASM-Toolkit-CLI", "ASM-Toolkit-CLI\ASM-Toolkit-CLI.csproj", "{44B94C11-DF4B-44EC-B087-328D1DC30A39}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{D09FC037-20DF-48C1-A97D-F01C1D40C774}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D09FC037-20DF-48C1-A97D-F01C1D40C774}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D09FC037-20DF-48C1-A97D-F01C1D40C774}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44B94C11-DF4B-44EC-B087-328D1DC30A39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44B94C11-DF4B-44EC-B087-328D1DC30A39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44B94C11-DF4B-44EC-B087-328D1DC30A39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44B94C11-DF4B-44EC-B087-328D1DC30A39}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

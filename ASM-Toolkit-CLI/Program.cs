@@ -1,4 +1,4 @@
-﻿namespace ASM_Toolkit;
+﻿namespace ASM_Toolkit_CLI;
 
 internal static class Programs
 {

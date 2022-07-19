@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using Newtonsoft.Json;
 
-namespace ASM_Toolkit.Flowchart;
+namespace ASM_Toolkit;
 
 public static class AsmSaverLoader
 {

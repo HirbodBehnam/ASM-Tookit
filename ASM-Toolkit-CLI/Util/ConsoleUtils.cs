@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace ASM_Toolkit.Util;
+namespace ASM_Toolkit_CLI.Util;
 
 public static class ConsoleUtils
 {

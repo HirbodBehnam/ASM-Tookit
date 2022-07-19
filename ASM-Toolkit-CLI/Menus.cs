@@ -1,7 +1,7 @@
-﻿using ASM_Toolkit.Flowchart;
-using ASM_Toolkit.Util;
+﻿using ASM_Toolkit;
+using ASM_Toolkit_CLI.Util;
 
-namespace ASM_Toolkit;
+namespace ASM_Toolkit_CLI;
 
 public static class Menus
 {

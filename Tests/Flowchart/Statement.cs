@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using ASM_Toolkit.Flowchart;
+using ASM_Toolkit;
 using NUnit.Framework;
 
 namespace Tests.Flowchart;

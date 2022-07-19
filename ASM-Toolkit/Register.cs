@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Numerics;
 
-namespace ASM_Toolkit.Flowchart;
+namespace ASM_Toolkit;
 
 public class Register
 {

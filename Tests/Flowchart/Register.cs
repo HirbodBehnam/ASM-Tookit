@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Numerics;
-using ASM_Toolkit.Flowchart;
+using ASM_Toolkit;
 using NUnit.Framework;
 
 namespace Tests.Flowchart;
