@@ -1,6 +1,7 @@
 ﻿using System.Numerics;
 using System.Text.RegularExpressions;
 using ASM_Toolkit;
+using ASM_Toolkit.Verilog;
 using ASM_Toolkit_CLI.Util;
 
 namespace ASM_Toolkit_CLI;
@@ -91,6 +92,21 @@ public class AsmMenus
 					break;
 				case '8':
 					SimulateMenu();
+					break;
+				case '9':
+					try
+					{
+						string verilogCode = VerilogGenerator.ConvertToVerilogCode(_asmChart);
+						Console.Write("Enter a filename to save the file in: ");
+						string path = Console.ReadLine()!;
+						File.WriteAllText(path, verilogCode);
+						Console.WriteLine("Done");
+					}
+					catch (Exception ex)
+					{
+						Console.WriteLine("Cannot save: " + ex.Message);
+					}
+
 					break;
 				case '0': // Exit
 					if (ConsoleUtils.InputKey("All unsaved changes will be discarded. Press y to exit: ") == 'y')
